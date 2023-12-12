@@ -1,0 +1,12 @@
+[package]
+name = "two_phase_commit"
+version = "0.1.0"
+authors = ["xiaohan2013"]
+license = "GPLv3"
+
+[dependencies]
+log = { version = "0.4.20", features = ["std"] }
+docopt = "1.1.1"
+log4rs = "1.2.0"
+serde = { version = "1", features = ["derive"] }
+ipc-channel = "0.18.0"
