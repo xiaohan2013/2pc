@@ -10,7 +10,9 @@ use docopt::Docopt;
 use serde::Deserialize;
 use log::{error, info, warn};
 use ipc_channel::platform;
+use std::borrow::BorrowMut;
 use std::thread;
+use std::env;
 
 mod coordinator;
 mod participant;
@@ -59,6 +61,7 @@ struct Args {
 }
 
 fn main() {
+    let args: Vec<String> = env::args().collect();
     // let argv = || vec!["two_phase_commit.exe", "-s", ".95", "-c", "4", "-p", "10", "-r", "10", "-m", "run"];
     let version = env!("CARGO_PKG_NAME").to_string() + ", version: " + env!("CARGO_PKG_VERSION");
     println!("======>{:?}", version);
@@ -86,6 +89,7 @@ fn main() {
     // register/launch clients, participants, coordinator
     let mut c1 = coordinator::Coordinator::new("main".to_string());
     let log_dir = "log/";
-    c1.register_participant("a", log_dir);
-    client::Client::commit(&mut c1, "commit");
+    let c_ref = &mut c1;
+    c_ref.register_participant("a", log_dir);
+    client::Client::commit(c_ref, "commit");
 }

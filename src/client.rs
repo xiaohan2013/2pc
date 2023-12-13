@@ -7,7 +7,7 @@ pub struct Client {
     name: String,
 }
 
-impl Client {
+impl Client{
     pub fn commit(coordinator: &mut Coordinator, msg: &str) {
         coordinator.commit(msg);
     }
