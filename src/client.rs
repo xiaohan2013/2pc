@@ -8,7 +8,7 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn commit(coordinator: &Coordinator, msg: &str) {
+    pub fn commit(coordinator: &mut Coordinator, msg: &str) {
         coordinator.commit(msg);
     }
 }

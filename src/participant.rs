@@ -29,27 +29,61 @@
 /// 
 /// 
 
+use rand::Rng;
 use std::sync::{Arc, atomic::AtomicBool};
 use std::fmt::{Display, Formatter, Result};
+use std::fs::File;
+use std::io::{Write, ErrorKind};
 
 use coordinator::Coordinator;
 
 #[derive(Debug)]
 pub struct Participant {
     name: String,
+    success_prob: f64,
+    log_file: File
 }
 
 impl Participant {
-    pub fn new(name: String) -> Participant {
+    pub fn new(name: String, log_file: String) -> Participant {
+        let mut rng = rand::thread_rng();
+        let log_file_name = format!("{}participant_{}.log", log_file, name);
+        let c_logfile_name = &log_file_name;
+        let mut log_file = File::options().append(true).open(c_logfile_name).unwrap_or_else(|error| {
+            if error.kind() == ErrorKind::NotFound {
+                File::create(c_logfile_name).unwrap_or_else(|error| {
+                    panic!("Problem creating the file: {:?}", error);
+                })
+            } else {
+                panic!("Problem opening the file: {:?}", error);
+            }
+        });
+
         Participant {
             name: name,
+            success_prob: rng.gen(),
+            log_file: log_file,
         }
+    }
+
+    pub fn append_log(&mut self, msg: String) {
+        // writeln!(self.log_file, ).unwrap_or_else(|error| {
+        //     panic!("Append log Error {:?}", error);
+        // });
+
+        self.log_file.write_all(msg.as_bytes()).unwrap_or_else(|error| {
+            panic!("Append log Error {:?}", error);
+        });
+    }
+
+    pub fn vote(&mut self, msg: String) {
+        self.append_log(msg);
     }
 }
 
 impl Display for Participant {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, " Participant[name:{}]", self.name)
+        write!(f, " Participant[name:{}, success_prob: {:.2}], log_file: {:?}", self.name, self.success_prob, self.log_file)
     }
 }
 

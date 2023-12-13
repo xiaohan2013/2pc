@@ -19,18 +19,19 @@ impl Coordinator {
         }
     }
 
-    pub fn query_to_commit(&self){
-        for (name, p) in self.participants.iter() {
-            println!("{:?} => {}", name, p)
+    pub fn query_to_commit(&mut self, msg: String){
+        for (name, p) in self.participants.iter_mut() {
+            println!("{:?} => {}", name, p);
+            p.vote(msg.to_string());
         }
     }
-    pub fn commit(&self, msg: &str){
+    pub fn commit(&mut self, msg: &str){
         println!("{:?}", msg);
-        self.query_to_commit();
+        self.query_to_commit(msg.to_string());
     }
 
-    pub fn register_participant(&mut self, name: &str){
-        let p = Participant::new(name.to_string());
+    pub fn register_participant(&mut self, name: &str, log_dir: &str){
+        let p = Participant::new(name.to_string(), log_dir.to_string());
         self.participants.insert(name.to_string(), p);
     }
 }

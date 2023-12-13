@@ -3,6 +3,8 @@ extern crate serde;
 extern crate log4rs;
 extern crate log;
 extern crate ipc_channel;
+extern crate rand;
+extern crate uuid;
 
 use docopt::Docopt;
 use serde::Deserialize;
@@ -83,6 +85,7 @@ fn main() {
     // println!("Got: {}", res)
     // register/launch clients, participants, coordinator
     let mut c1 = coordinator::Coordinator::new("main".to_string());
-    c1.register_participant("a");
-    client::Client::commit(&c1, "commit");
+    let log_dir = "log/";
+    c1.register_participant("a", log_dir);
+    client::Client::commit(&mut c1, "commit");
 }

@@ -10,3 +10,5 @@ docopt = "1.1.1"
 log4rs = "1.2.0"
 serde = { version = "1", features = ["derive"] }
 ipc-channel = "0.18.0"
+rand = "0.8.5"
+uuid = "1.6.1"
