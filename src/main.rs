@@ -82,6 +82,7 @@ fn main() {
     // let res = String::from_utf8(rev).expect("Found invalid UTF-8");
     // println!("Got: {}", res)
     // register/launch clients, participants, coordinator
-    let c1 = coordinator::Coordinator::new("main".to_string());
+    let mut c1 = coordinator::Coordinator::new("main".to_string());
+    c1.register_participant("a");
     client::Client::commit(&c1, "commit");
 }

@@ -1,4 +1,7 @@
-use std:Arc;
+use std::sync::{Arc, Mutex};
+use std::collections::HashMap;
+use std::fs::File;
+
 
 #[derive(Debug)]
 pub struct OpLog {
@@ -9,5 +12,13 @@ pub struct OpLog {
 }
 
 impl OpLog {
-    pub fn new(fpath: String) -> OpLog {}
+    pub fn new(fpath: String) -> OpLog {
+        let mut log_file = File::open(fpath)?;
+        OpLog {
+            seqno = ,
+            log_arc = Arc::new(Mutex::new(HashMap::new())),
+            path = fpath,
+            lf = log_file
+        }
+    }
 }

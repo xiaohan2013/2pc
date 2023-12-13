@@ -30,6 +30,7 @@
 /// 
 
 use std::sync::{Arc, atomic::AtomicBool};
+use std::fmt::{Display, Formatter, Result};
 
 use coordinator::Coordinator;
 
@@ -38,18 +39,32 @@ pub struct Participant {
     name: String,
 }
 
-fn register_participants(
-    coordinator: &mut Coordinator,
-    n_participants: i32,
-    logpathbase: &String,
-    running: &Arc<AtomicBool>, 
-    success_prob: f64) -> Vec<Participant> {
-
-    let participants = vec![];
-    // TODO
-    // register participants with coordinator (set up communication channels and sync objects)
-    // add client to the vector and return the vector.
-    
-    participants
+impl Participant {
+    pub fn new(name: String) -> Participant {
+        Participant {
+            name: name,
+        }
+    }
 }
+
+impl Display for Participant {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, " Participant[name:{}]", self.name)
+    }
+}
+
+// fn register_participants(
+//     coordinator: &mut Coordinator,
+//     n_participants: i32,
+//     logpathbase: &String,
+//     running: &Arc<AtomicBool>, 
+//     success_prob: f64) -> Vec<Participant> {
+
+//     let participants = vec![];
+//     // TODO
+//     // register participants with coordinator (set up communication channels and sync objects)
+//     // add client to the vector and return the vector.
+    
+//     participants
+// }
 
