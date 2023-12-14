@@ -13,6 +13,10 @@ use ipc_channel::platform;
 use std::borrow::BorrowMut;
 use std::thread;
 use std::env;
+use std::sync::Arc;
+use std::cell::RefCell;
+use std::rc::Rc;
+
 
 mod coordinator;
 mod participant;
@@ -87,9 +91,9 @@ fn main() {
     // let res = String::from_utf8(rev).expect("Found invalid UTF-8");
     // println!("Got: {}", res)
     // register/launch clients, participants, coordinator
-    let mut c1 = coordinator::Coordinator::new("main".to_string());
+
+    let mut c1: coordinator::Coordinator = coordinator::Coordinator::new("main".to_string());
     let log_dir = "log/";
-    let c_ref = &mut c1;
-    c_ref.register_participant("a", log_dir);
-    client::Client::commit(c_ref, "commit");
+    c1.register_participant("aaaa", log_dir);
+    client::Client::commit(&mut c1, "commit");
 }

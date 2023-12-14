@@ -37,19 +37,22 @@ use std::fs::File;
 use std::io::{Write, ErrorKind};
 use std::sync::mpsc::{channel, Sender, Receiver};
 use std::cell::{RefCell, RefMut};
+use std::rc::Rc;
 
 use coordinator::Coordinator;
 
+use crate::coordinator::CHANNEL;
+
 #[derive(Debug)]
-pub struct Participant<'a> {
+pub struct Participant {
     name: String,
     success_prob: f64,
     log_file: File,
-    receiver: &'a mut Receiver<String>,
+    channel: Rc<CHANNEL<String>>,
 }
 
-impl<'a> Participant<'a> {
-    pub fn new(name: String, log_file: String, receiver: &mut Receiver<String>) -> Participant {
+impl Participant {
+    pub fn new(name: String, log_file: String, receiver: Rc<CHANNEL<String>>) -> Participant {
         let mut rng = rand::thread_rng();
         let log_file_name = format!("{}participant_{}.log", log_file, name);
         let c_logfile_name = &log_file_name;
@@ -67,7 +70,7 @@ impl<'a> Participant<'a> {
             name: name,
             success_prob: rng.gen(),
             log_file: log_file,
-            receiver: receiver,
+            channel: receiver,
         }
     }
 
@@ -75,18 +78,21 @@ impl<'a> Participant<'a> {
         // writeln!(self.log_file, ).unwrap_or_else(|error| {
         //     panic!("Append log Error {:?}", error);
         // });
-
         self.log_file.write_all(msg.as_bytes()).unwrap_or_else(|error| {
             panic!("Append log Error {:?}", error);
         });
     }
 
     pub fn vote(&mut self, msg: String) {
+        let res = self.channel.1.recv().unwrap_or_else(|error| {
+            panic!("{:?}", error)
+        });
+        println!(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> {:?}", res);
         self.append_log(msg);
     }
 }
 
-impl<'a> Display for Participant<'a> {
+impl Display for Participant {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, " Participant[name:{}, success_prob: {:.2}], log_file: {:?}", self.name, self.success_prob, self.log_file)
     }
