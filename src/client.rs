@@ -1,5 +1,7 @@
 // mod coordinator;
 
+use std::marker::PhantomData;
+
 use coordinator::Coordinator;
 
 #[derive(Debug)]

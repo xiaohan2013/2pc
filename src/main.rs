@@ -91,7 +91,6 @@ fn main() {
     // let res = String::from_utf8(rev).expect("Found invalid UTF-8");
     // println!("Got: {}", res)
     // register/launch clients, participants, coordinator
-
     let mut c1: coordinator::Coordinator = coordinator::Coordinator::new("main".to_string());
     let log_dir = "log/";
     c1.register_participant("aaaa", log_dir);

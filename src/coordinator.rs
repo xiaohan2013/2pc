@@ -16,7 +16,7 @@ pub struct Coordinator {
 }
 
 impl Coordinator {
-    pub fn new(name: String) -> Coordinator {
+    pub fn new(name: String) -> Self {
         Coordinator {
             name: name, 
             // participants: vec![],
@@ -31,6 +31,7 @@ impl Coordinator {
             p.vote(msg.to_string());
         }
     }
+
     pub fn commit(&mut self, msg: &str){
         println!("{:?}", msg);
         for c in self.channels.iter_mut() {
@@ -45,7 +46,8 @@ impl Coordinator {
         let c = channel::<String>();
         let c_ref = Rc::new(c);
         let c_ref2 = c_ref.clone();
-        let p = Participant::new(name.to_string(), log_dir.to_string(),  c_ref);
+        let mut p = Participant::new(name.to_string(), log_dir.to_string(),  c_ref);
+        p.run();
         if !self.participants.contains_key(name) {
             self.participants.insert(name.to_string(), p);
         } else {

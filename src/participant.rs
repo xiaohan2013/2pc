@@ -30,7 +30,6 @@
 /// 
 
 use rand::Rng;
-use std::borrow::BorrowMut;
 use std::sync::{Arc, atomic::AtomicBool};
 use std::fmt::{Display, Formatter, Result};
 use std::fs::File;
@@ -38,6 +37,7 @@ use std::io::{Write, ErrorKind};
 use std::sync::mpsc::{channel, Sender, Receiver};
 use std::cell::{RefCell, RefMut};
 use std::rc::Rc;
+use std::thread::{self, JoinHandle};
 
 use coordinator::Coordinator;
 
@@ -49,10 +49,11 @@ pub struct Participant {
     success_prob: f64,
     log_file: File,
     channel: Rc<CHANNEL<String>>,
+    worker: Option<JoinHandle<()>>,
 }
 
 impl Participant {
-    pub fn new(name: String, log_file: String, receiver: Rc<CHANNEL<String>>) -> Participant {
+    pub fn new(name: String, log_file: String, receiver: Rc<CHANNEL<String>>) -> Self {
         let mut rng = rand::thread_rng();
         let log_file_name = format!("{}participant_{}.log", log_file, name);
         let c_logfile_name = &log_file_name;
@@ -71,6 +72,7 @@ impl Participant {
             success_prob: rng.gen(),
             log_file: log_file,
             channel: receiver,
+            worker: None,
         }
     }
 
@@ -89,6 +91,21 @@ impl Participant {
         });
         println!(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> {:?}", res);
         self.append_log(msg);
+        self.start();
+    }
+
+    pub fn run(self: &mut Self) {
+        let mut handler = thread::spawn(move || {
+            println!("this is thread number {}", "abc".to_string());
+        });
+        self.worker = Some(handler);
+    }
+
+    pub fn start(self: &mut Self) {
+        // Start all threads
+        self.worker
+            .take().expect("Called stop on non-running thread")
+            .join().expect("Could not join spawned thread");
     }
 }
 
@@ -98,18 +115,4 @@ impl Display for Participant {
     }
 }
 
-// fn register_participants(
-//     coordinator: &mut Coordinator,
-//     n_participants: i32,
-//     logpathbase: &String,
-//     running: &Arc<AtomicBool>, 
-//     success_prob: f64) -> Vec<Participant> {
-
-//     let participants = vec![];
-//     // TODO
-//     // register participants with coordinator (set up communication channels and sync objects)
-//     // add client to the vector and return the vector.
-    
-//     participants
-// }
 
