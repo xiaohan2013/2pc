@@ -21,6 +21,7 @@ use std::rc::Rc;
 mod coordinator;
 mod participant;
 mod client;
+mod commitlog;
 
 const USAGE: &'static str = "
 Two Phase Commit.
