@@ -337,7 +337,7 @@ impl CommitLog {
 
         info!("Opening log in directory {:?}", &opts.log_dir.to_str());
 
-        let fs = FileSet::load_log(opts)?;
+        let fs: FileSet = FileSet::load_log(opts)?;
         Ok(CommitLog { file_set: fs })
     }
 
@@ -408,6 +408,7 @@ impl CommitLog {
             // TODO: reduce indexing of every message
             let index = self.file_set.active_index_mut();
             let mut index_pos_buf = IndexBuf::new(buf_len, index.starting_offset());
+            
             let mut pos = meta.starting_position;
             for m in buf.iter() {
                 index_pos_buf.push(m.offset(), pos as u32);
@@ -416,6 +417,7 @@ impl CommitLog {
             // TODO: what happens when this errors out? Do we truncate the log...?
             index.append(index_pos_buf)?;
         }
+        
 
         Ok(OffsetRange(start_off, buf_len))
     }

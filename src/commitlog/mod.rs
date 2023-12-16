@@ -10,7 +10,7 @@ extern crate env_logger;
 mod index;
 mod segment;
 mod file_set;
-mod message;
+pub mod message;
 mod reader;
 mod testutil;
 

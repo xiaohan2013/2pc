@@ -1,5 +1,7 @@
 use super::commitlog::Offset;
 use log::{trace, info, warn};
+use log4rs::append::file;
+use rand::seq::index;
 use super::byteorder::{ByteOrder, LittleEndian};
 use super::memmap2::MmapMut;
 use super::page_size;
@@ -150,22 +152,25 @@ impl Index {
 
         info!("Creating index file {:?}", &index_path);
 
-        let index_file = OpenOptions::new()
+        let mut index_file = OpenOptions::new()
             .read(true)
             .write(true)
             .append(true)
             .create_new(true)
+            .truncate(true)
+            .create(true)
             .open(&index_path)?;
 
         // read the metadata and truncate
-        let meta = index_file.metadata()?;
+        let meta: fs::Metadata = index_file.metadata()?;
         let len = meta.len();
         if len == 0 {
+            info!("=================>>>debug");
             index_file.set_len(file_bytes as u64)?;
+            info!("<<<<====================")
         }
 
         let mmap = unsafe { MmapMut::map_mut(&index_file)? };
-
         Ok(Index {
             file: index_file,
             path: index_path,
@@ -262,7 +267,9 @@ impl Index {
 
         // unmap the file (Set to dummy anonymous map)
         self.mmap = MmapMut::map_anon(32)?;
-        self.file.set_len(new_len as u64)?;
+        
+        // self.file.set_len(new_len as u64)?;
+        let _ = self.file.set_len(new_len as u64);
         self.mmap = unsafe { MmapMut::map_mut(&self.file)? };
         Ok(())
     }
@@ -270,7 +277,7 @@ impl Index {
     pub fn append(&mut self, offsets: IndexBuf) -> io::Result<()> {
         // TODO: trace
         //trace!("Index append: {:?}", abs_offset, position);
-
+        
         assert_eq!(
             self.base_offset, offsets.1,
             "Buffer starting offset does not match the index starting offset"
@@ -518,9 +525,17 @@ impl Index {
 
 #[cfg(test)]
 mod tests {
+    // cargo test --package school_info repeat_students_should_not_get_full_marks -- --exact
+    // cargo test test_mod_name::test_fn_name -- --exact
     use super::{super::testutil::*, *};
     use super::super::env_logger;
     use std::{fs, path::PathBuf};
+
+    #[test]
+    pub fn test_index() {
+        let path = TestDir::new();
+        let mut index = Index::new(&path, 9u64, 1000usize).unwrap();
+    }
 
     #[test]
     pub fn index() {
