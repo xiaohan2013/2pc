@@ -19,8 +19,17 @@ memmap2 = "0.9"
 page_size = "0.6.0"
 fs4 = "0.7.0"
 memmap = "0.7.0"
+protobuf = "2.28.0"
+
 
 [dev-dependencies]
 criterion = "0.5"
 env_logger = "0.10.1"
 rand = "0.8"
+
+
+[build-dependencies]
+protobuf-codegen = "3"
+protoc-bin-vendored = "3.0.0"
+protoc-rust = "2.28.0"
+protobuf-codegen-pure = "2"
