@@ -12,7 +12,6 @@ mod participant;
 mod client;
 mod commitlog;
 
-
 use docopt::Docopt;
 use serde::Deserialize;
 use log::{error, info, warn};
