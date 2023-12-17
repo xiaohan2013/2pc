@@ -7,6 +7,7 @@ use super::coordinator::Coordinator;
 #[derive(Debug)]
 pub struct Client {
     name: String,
+    // phantom: PhantomData<T>,
 }
 
 impl Client{

@@ -6,11 +6,13 @@ extern crate ipc_channel;
 extern crate rand;
 extern crate uuid;
 extern crate memmap2;
+extern crate futures as futures_core;
 
 mod coordinator;
 mod participant;
 mod client;
 mod commitlog;
+mod rpc;
 
 use docopt::Docopt;
 use serde::Deserialize;
@@ -28,8 +30,13 @@ use std::time;
 use std::time::SystemTime;
 use std::fs::File;
 use std::str::from_utf8;
+use std::time::Duration;
+use crossbeam_channel::{bounded, tick, Receiver, select};
+
 
 use ipc_channel::ipc::{self, IpcOneShotServer, IpcSender, IpcReceiver};
+
+use crate::coordinator::Coordinator;
 
 
 const USAGE: &'static str = "
@@ -74,7 +81,16 @@ struct Args {
     flag_num: Option<u8>
 }
 
-fn main() -> std::io::Result<()> {
+fn ctrl_channel() -> Result<Receiver<()>, ctrlc::Error> {
+    let (sender, receiver) = bounded(100);
+    ctrlc::set_handler(move || {
+        let _ = sender.send(());
+    })?;
+    Ok(receiver)
+}
+
+
+fn main() -> Result<(), exitfailure::ExitFailure> {
     let args: Vec<String> = env::args().collect();
     // let argv = || vec!["two_phase_commit.exe", "-s", ".95", "-c", "4", "-p", "10", "-r", "10", "-m", "run"];
     let version = env!("CARGO_PKG_NAME").to_string() + ", version: " + env!("CARGO_PKG_VERSION");
@@ -101,10 +117,12 @@ fn main() -> std::io::Result<()> {
     // let res = String::from_utf8(rev).expect("Found invalid UTF-8");
     // println!("Got: {}", res)
     // register/launch clients, participants, coordinator
-    // let mut c1: coordinator::Coordinator = coordinator::Coordinator::new("main".to_string());
-    // let log_dir = "log/";
-    // c1.register_participant("aaaa", log_dir);
-    // client::Client::commit(&mut c1, "commit");
+    let mut _c1: coordinator::Coordinator = coordinator::Coordinator::new("main".to_string());
+    _c1.init_rpc();
+    let log_dir = "log/";
+    _c1.register_participant("aaaa", log_dir);
+    client::Client::commit(&mut _c1, "commit");
+
     // open a directory called 'log' for segment and index storage
     // let opts: LogOptions = LogOptions::new(format!(
     //     "log\\{}",
@@ -161,5 +179,22 @@ fn main() -> std::io::Result<()> {
     // let (_, dat) = server.accept().unwrap();
     // println!("-----------> {:?}", from_utf8(dat.as_bytes()));
     
+    // let _rt = tokio::runtime::Runtime::new().unwrap();
+    // std::thread::sleep(std::time::Duration::from_secs(10));
+
+    let ctrl_c_events= ctrl_channel()?;
+    let ticks = tick(Duration::from_secs(5));
+    loop {
+        select! {
+            recv(ticks) -> _ => {
+                println!("working!");
+            }
+            recv(ctrl_c_events) -> _ => {
+                println!();
+                println!("Goodbye!");
+                break;
+            }
+        }
+    }
     Ok(())
 }

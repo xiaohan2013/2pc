@@ -48,12 +48,12 @@ pub struct Participant {
     name: String,
     success_prob: f64,
     log_file: File,
-    channel: Rc<CHANNEL<String>>,
+    channel: Arc<CHANNEL<String>>,
     worker: Option<JoinHandle<()>>,
 }
 
 impl Participant {
-    pub fn new(name: String, log_file: String, receiver: Rc<CHANNEL<String>>) -> Self {
+    pub fn new(name: String, log_file: String, receiver: Arc<CHANNEL<String>>) -> Self {
         let mut rng = rand::thread_rng();
         let log_file_name = format!("{}participant_{}.log", log_file, name);
         let c_logfile_name = &log_file_name;
@@ -74,6 +74,10 @@ impl Participant {
             channel: receiver,
             worker: None,
         }
+    }
+
+    pub fn init_rpc(){
+        
     }
 
     pub fn append_log(&mut self, msg: String) {

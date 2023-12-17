@@ -5,13 +5,23 @@ syntax = "proto3";
 package two_phase_commit;
 
 // service which can be executed
-service PreparePhase {
+service TwoPhaseCommitService {
     // 
     rpc Prepare(PreparePhaseReq) returns (PreparePhaseResp);
     // function which can be called
     // rpc SendStream(SayRequest) returns (stream SayResponse);
     // rpc ReceiveStream(stream SayRequest) returns (SayResponse);
     // rpc Bidirectional(stream SayRequest) returns (stream SayResponse);
+    rpc Commit(CommitPhaseReq) returns (CommitPhaseResp);
+    // rpc Hearbeat(BaseReq) returns (BaseResp);
+}
+
+message BaseReq {
+    string version = 1;
+}
+
+message BaseResp {
+    string version = 1;
 }
 
 message PreparePhaseReq {
@@ -22,10 +32,6 @@ message PreparePhaseReq {
 message PreparePhaseResp {
     string version = 1;
     string ack = 2;
-}
-
-service CommitPhase {
-    rpc Commit(CommitPhaseReq) returns (CommitPhaseResp);
 }
 
 message CommitPhaseReq {
