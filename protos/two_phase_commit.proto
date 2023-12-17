@@ -1,0 +1,37 @@
+// version of protocol buffer used
+syntax = "proto3";
+
+// package name for the buffer will be used later
+package two_phase_commit;
+
+// service which can be executed
+service PreparePhase {
+    // 
+    rpc Prepare(PreparePhaseReq) returns (PreparePhaseResp);
+    // function which can be called
+    // rpc SendStream(SayRequest) returns (stream SayResponse);
+    // rpc ReceiveStream(stream SayRequest) returns (SayResponse);
+    // rpc Bidirectional(stream SayRequest) returns (stream SayResponse);
+}
+
+message PreparePhaseReq {
+    string version = 1;
+    string command = 2;
+}
+
+message PreparePhaseResp {
+    string version = 1;
+    string ack = 2;
+}
+
+service CommitPhase {
+    rpc Commit(CommitPhaseReq) returns (CommitPhaseResp);
+}
+
+message CommitPhaseReq {
+    string version = 1;
+}
+
+message CommitPhaseResp {
+    string version = 1;
+}

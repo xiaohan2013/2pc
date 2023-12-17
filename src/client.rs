@@ -2,7 +2,7 @@
 
 use std::marker::PhantomData;
 
-use coordinator::Coordinator;
+use super::coordinator::Coordinator;
 
 #[derive(Debug)]
 pub struct Client {

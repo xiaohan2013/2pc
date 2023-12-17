@@ -39,7 +39,7 @@ use std::cell::{RefCell, RefMut};
 use std::rc::Rc;
 use std::thread::{self, JoinHandle};
 
-use coordinator::Coordinator;
+use super::coordinator::Coordinator;
 
 use crate::coordinator::CHANNEL;
 

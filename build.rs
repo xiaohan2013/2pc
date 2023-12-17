@@ -35,8 +35,9 @@
 
 fn main() {
     tonic_build::configure()
-        .build_server(false)
-        .out_dir("src/protos")
-        .compile(&["src/protos/message.proto"], &["src/protos"])
+        .build_server(true)
+        .build_client(true)
+        .out_dir("src/rpc")
+        .compile(&["protos/two_phase_commit.proto"], &["protos"])
         .unwrap()
 }

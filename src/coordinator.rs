@@ -4,7 +4,8 @@ use std::collections::HashMap;
 use std::sync::mpsc::{channel, Sender, Receiver};
 use std::rc::Rc;
 
-use participant::Participant;
+// use participant::Participant;
+use crate::participant::Participant;
 
 pub type CHANNEL<T> = (Sender<T>, Receiver<T>);
 
