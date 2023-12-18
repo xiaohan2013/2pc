@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+#![allow(unused_imports)]
 
 use std::borrow::BorrowMut;
 use std::collections::HashMap;
@@ -18,6 +20,9 @@ use rpc::two_phase_commit::PreparePhaseReq;
 use tokio::sync::futures;
 use tonic::transport::Channel;
 use futures_core::executor; 
+use tokio::task;
+use tokio::runtime::Builder;
+
 
 pub type CHANNEL<T> = (Sender<T>, Receiver<T>);
 
@@ -40,28 +45,45 @@ impl Coordinator {
         }
     }
 
-    pub fn init_rpc(&mut self) {
+    pub fn init_rpc(&mut self) -> Result<(), Box<dyn std::error::Error> >{
         println!("Initalize rpc server...");
         let server_running = Arc::new(AtomicBool::new(false));
         let _server_running = server_running.clone();
-        thread::spawn(move || {
+        thread::spawn(|| {
             println!("Starting Rpc Server");
-            let _ = rpc::server::init_rpc_server();
+            let res = rpc::server::init_rpc_server();
+            println!(">>>>>>>> {:?}", res);
             // let mut res = executor::block_on().into();
             // println!("{}", res.into())
             // _server_running.store(true, atomic::Ordering::SeqCst);
         });
+        // let rt = tokio::runtime::Builder::new_multi_thread()
+        //                 .worker_threads(2)
+        //                 .enable_all()
+        //                 .build()
+        //                 .unwrap();
+        // let _ = rt.block_on(rpc::server::init_rpc_server());
+        // let handle = tokio::spawn(rpc::server::init_rpc_server());
+        // let out = handle.await?;
 
         // wait server starting
         // while !server_running.load(Ordering::SeqCst) {}
         println!("Initalize rpc client...");
         // let _self = Arc::new(self);
-        let _rpc_client = rpc::client::init_rpc_client("http://[::1]:50051");
-        let rpc_client = _rpc_client.unwrap_or_else(|error| {
-            panic!("initialize rpc client error, {}", error)
-        });
+        let rt = tokio::runtime::Runtime::new().unwrap();
+        let _rpc_client = rt.block_on(rpc::client::init_rpc_client("http://[::]:50051"));
+        // let _rpc_client = rpc::client::init_rpc_client("http://[::]:50051");
+
+        let rpc_client = match _rpc_client {
+            Ok(res) => { 
+                println!("{:?}", res);
+                res
+            },
+            Err(error) => {panic!("initialize rpc client error, {}", error)},
+        };
+
         self.rpc_client = Some(RefCell::new(rpc_client));
-        
+        Ok(())
     }
 
     pub fn query_to_commit(&mut self, msg: String){
@@ -70,7 +92,18 @@ impl Coordinator {
             p.vote(msg.to_string());
             let _rpc_client = self.rpc_client.take().expect("msg");
             println!("Executing send query msg to rpc-client");
-            let _ = rpc::client::send_client(_rpc_client);
+            let rt = tokio::runtime::Runtime::new().unwrap();
+            let _ = rt.block_on(rpc::client::send_client(_rpc_client));
+            // let _ = rpc::client::send_client(_rpc_client).await?;
+            // let handle = task::spawn(rpc::client::send_client(_rpc_client));
+            // let runtime: tokio::runtime::Runtime = Builder::new_multi_thread()
+            //                     .worker_threads(1)
+            //                     .enable_all()
+            //                     .build()
+            //                     .unwrap();
+            //    runtime.block_on(rpc::client::send_client(_rpc_client))
+            // println!("query_to_commit: {:?}", _rpc_client);
+            // let _ = rpc::client::send_client(_rpc_client);
         }
     }
 

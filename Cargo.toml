@@ -16,6 +16,9 @@ edition = "2021"
 [[bin]]
 name="two_phase_commit"
 path="src/main.rs"
+test=false
+
+
 
 
 [dependencies]
@@ -42,6 +45,9 @@ crossbeam-channel = "0.5.9"
 ctrlc = "3.4.1"
 exitfailure = "0.5.1"
 futures = "0.3.29"
+tower = "0.4.13"
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
 
 
 [dev-dependencies]

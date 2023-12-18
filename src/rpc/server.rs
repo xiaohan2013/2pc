@@ -39,16 +39,29 @@ impl TwoPhaseCommitService for TwoPhaseCommitPrepare {
 // }
 
 #[tokio::main]
-pub async fn init_rpc_server() -> Result<String, Box<dyn std::error::Error>> {
+pub async fn init_rpc_server() -> Result<String, Box<dyn std::error::Error>>{
     // defining address for our service
-    let addr: std::net::SocketAddr = "[::1]:50051".parse().unwrap();
+    let addr: std::net::SocketAddr = "[::]:50051".parse().unwrap();
     // creating a service
     let prepare_phase = TwoPhaseCommitPrepare::default();
-    println!("Rpc Server listening on {}", addr);
+    println!("Rpc Server listening on {:?}", addr);
     // adding our service to our server.
     Server::builder()
         .add_service(TwoPhaseCommitServiceServer::new(prepare_phase))
         .serve(addr)
         .await?;
     Ok("Ok".to_string())
+}
+
+pub async fn init_rpc_server1(){
+    // defining address for our service
+    let addr: std::net::SocketAddr = "[::1]:50051".parse().unwrap();
+    // creating a service
+    let prepare_phase = TwoPhaseCommitPrepare::default();
+    println!("Rpc Server listening on {}", addr);
+    // adding our service to our server.
+    let _ = Server::builder()
+        .add_service(TwoPhaseCommitServiceServer::new(prepare_phase))
+        .serve(addr)
+        .await;
 }

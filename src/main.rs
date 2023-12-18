@@ -1,3 +1,6 @@
+#![allow(dead_code)]
+#![allow(unused_imports)]
+
 extern crate docopt;
 extern crate serde;
 extern crate log4rs;
@@ -7,6 +10,7 @@ extern crate rand;
 extern crate uuid;
 extern crate memmap2;
 extern crate futures as futures_core;
+extern crate tower;
 
 mod coordinator;
 mod participant;
