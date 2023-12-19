@@ -8,7 +8,7 @@ use std::rc::Rc;
 use std::sync::Arc;
 use std::cell::RefCell;
 use std::sync::atomic::{self, AtomicBool, Ordering};
-
+use std::thread::JoinHandle;
 
 // use participant::Participant;
 use crate::participant::Participant;
@@ -32,6 +32,7 @@ pub struct Coordinator {
     participants: HashMap<String, Participant>,
     channels: Vec<Arc<CHANNEL<String>>>,
     rpc_client: Option<RefCell<TwoPhaseCommitServiceClient<Channel>>>,
+    pub rpc_server: Option<RefCell<JoinHandle<()>>>,
 }
 
 impl Coordinator {
@@ -42,6 +43,7 @@ impl Coordinator {
             participants: HashMap::new(),
             channels: vec![],
             rpc_client: None,
+            rpc_server: None,
         }
     }
 
@@ -49,20 +51,37 @@ impl Coordinator {
         println!("Initalize rpc server...");
         let server_running = Arc::new(AtomicBool::new(false));
         let _server_running = server_running.clone();
-        thread::spawn(|| {
+        
+        let _ = thread::Builder::new().name("rpc-server".to_string()).spawn(|| {
             println!("Starting Rpc Server");
+            // let res = rpc::server::init_rpc_server1();
             let res = rpc::server::init_rpc_server();
             println!(">>>>>>>> {:?}", res);
-            // let mut res = executor::block_on().into();
-            // println!("{}", res.into())
-            // _server_running.store(true, atomic::Ordering::SeqCst);
         });
+
+        // let server_join_handle = thread::spawn(move || {
+        //     println!("Starting Rpc Server");
+        //     // let res = rpc::server::init_rpc_server();
+        //     // let mut res = executor::block_on().into();
+        //     // println!("{}", res.into())
+        //     // _server_running.store(true, atomic::Ordering::SeqCst);
+        //     // let rt = tokio::runtime::Builder::new_multi_thread()
+        //     //     .worker_threads(2)
+        //     //     .enable_all()
+        //     //     .build()
+        //     //     .unwrap();
+        //     // let res = rt.block_on(rpc::server::init_rpc_server1());
+        //     let res = rpc::server::init_rpc_server1();
+        //     println!(">>>>>>>> {:?}", res);
+        // });
+        // server_join_handle.join();
+        // self.rpc_server = Some(RefCell::new(server_join_handle));
         // let rt = tokio::runtime::Builder::new_multi_thread()
         //                 .worker_threads(2)
         //                 .enable_all()
         //                 .build()
         //                 .unwrap();
-        // let _ = rt.block_on(rpc::server::init_rpc_server());
+        // let _ = rt.block_on(rpc::server::init_rpc_server1());
         // let handle = tokio::spawn(rpc::server::init_rpc_server());
         // let out = handle.await?;
 
@@ -71,8 +90,8 @@ impl Coordinator {
         println!("Initalize rpc client...");
         // let _self = Arc::new(self);
         let rt = tokio::runtime::Runtime::new().unwrap();
-        let _rpc_client = rt.block_on(rpc::client::init_rpc_client("http://[::]:50051"));
-        // let _rpc_client = rpc::client::init_rpc_client("http://[::]:50051");
+        let _rpc_client = rt.block_on(rpc::client::init_rpc_client("http://127.0.0.1:50051"));
+        // let _rpc_client = rpc::client::init_rpc_client("http://[::1]:50051");
 
         let rpc_client = match _rpc_client {
             Ok(res) => { 
@@ -81,8 +100,8 @@ impl Coordinator {
             },
             Err(error) => {panic!("initialize rpc client error, {}", error)},
         };
-
         self.rpc_client = Some(RefCell::new(rpc_client));
+        
         Ok(())
     }
 
@@ -92,16 +111,16 @@ impl Coordinator {
             p.vote(msg.to_string());
             let _rpc_client = self.rpc_client.take().expect("msg");
             println!("Executing send query msg to rpc-client");
-            let rt = tokio::runtime::Runtime::new().unwrap();
-            let _ = rt.block_on(rpc::client::send_client(_rpc_client));
+            // let rt = tokio::runtime::Runtime::new().unwrap();
+            // let _ = rt.block_on(rpc::client::send_client(_rpc_client));
             // let _ = rpc::client::send_client(_rpc_client).await?;
             // let handle = task::spawn(rpc::client::send_client(_rpc_client));
-            // let runtime: tokio::runtime::Runtime = Builder::new_multi_thread()
-            //                     .worker_threads(1)
-            //                     .enable_all()
-            //                     .build()
-            //                     .unwrap();
-            //    runtime.block_on(rpc::client::send_client(_rpc_client))
+            let runtime: tokio::runtime::Runtime = Builder::new_multi_thread()
+                                .worker_threads(1)
+                                .enable_all()
+                                .build()
+                                .unwrap();
+            runtime.block_on(rpc::client::send_client(_rpc_client))
             // println!("query_to_commit: {:?}", _rpc_client);
             // let _ = rpc::client::send_client(_rpc_client);
         }

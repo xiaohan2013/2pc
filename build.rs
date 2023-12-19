@@ -37,7 +37,7 @@ fn main() {
     tonic_build::configure()
         .build_server(true)
         .build_client(true)
-        .out_dir("src/rpc")
+        .out_dir("v2/rpc/src")
         .compile(&["protos/two_phase_commit.proto"], &["protos"])
         .unwrap()
 }

@@ -1,35 +1,13 @@
 [package]
-name = "two_phase_commit"
+name = "rpc"
 version = "0.1.0"
 authors = ["xiaohan2013"]
 license = "GPLv3"
 edition = "2021"
 
-# [[bin]]
-# name="server"
-# path="src/rpc/server.rs"
-
-# [[bin]]
-# name="client"
-# path="src/rpc/client.rs"
-
-# [[bin]]
-# name="two_phase_commit"
-# path="src/main.rs"
-# test=false
-
-# [[bin]]
-# name="server"
-# path="src/main.rs"
-# test=false
-
-[workspace]
-members = [
-    "v2/client",
-    "v2/rpc",
-    "v2/server"
-]
-resolver = "2"
+[lib]
+name="rpc"
+path="src/lib.rs"
 
 [dependencies]
 log = { version = "0.4.20", features = ["std"] }

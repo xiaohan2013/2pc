@@ -7,7 +7,7 @@ use super::two_phase_commit::{PreparePhaseReq, PreparePhaseResp};
 use std::cell::RefCell;
 use std::sync::Arc;
 use std::time::Duration;
-
+use tokio::runtime::Builder;
 
 // #[tokio::main]
 // async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -71,6 +71,12 @@ pub async fn init_rpc_client(endpoint: &'static str) -> Result<TwoPhaseCommitSer
     Ok(client)
 }
 
+pub fn init_rpc_client_sync() -> Result<TwoPhaseCommitServiceClient<Channel>, tonic::transport::Error> {
+    let rt = Builder::new_multi_thread().enable_all().build().unwrap();
+    let client = rt.block_on(TwoPhaseCommitServiceClient::connect("http://[::1]:50051"))?;
+    Ok(client)
+}
+
 // #[tokio::main]
 // pub async fn send_client(client: RefCell<TwoPhaseCommitServiceClient<tower::timeout::Timeout<Channel>>>) -> Result<PreparePhaseResp, Box<dyn std::error::Error>> {
 //     let req = tonic::Request::new(
@@ -91,11 +97,11 @@ pub async fn send_client(client: RefCell<TwoPhaseCommitServiceClient<Channel>>) 
         PreparePhaseReq {
             version: "1".to_owned(),
             command: "vote?".to_owned(),
-        }
-    );
-    println!("send_client: {:?}", client);
+        });
+    println!("send_client request : {:?}", req);
     // sending request and waiting for response
     let resp = client.borrow_mut().prepare(req).await;
     println!("RESPONSE={:?}", resp);
     // Ok(())
 }
+

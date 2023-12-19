@@ -386,6 +386,46 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "702fc72eb24e5a1e48ce58027a675bc24edd52096d5397d4aea7c6dd9eca0bd1"
 
 [[package]]
+name = "client"
+version = "0.1.0"
+dependencies = [
+ "byteorder",
+ "bytes",
+ "crc32c",
+ "criterion",
+ "crossbeam-channel",
+ "ctrlc",
+ "docopt",
+ "env_logger",
+ "exitfailure",
+ "feature",
+ "fs4",
+ "futures",
+ "ipc-channel",
+ "log",
+ "log4rs",
+ "memmap",
+ "memmap2",
+ "page_size",
+ "prost",
+ "protobuf 2.28.0",
+ "protobuf-codegen 3.3.0",
+ "protobuf-codegen-pure",
+ "protoc-bin-vendored",
+ "protoc-rust",
+ "rand",
+ "rpc",
+ "serde",
+ "tokio",
+ "tonic",
+ "tonic-build",
+ "tower",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
+]
+
+[[package]]
 name = "colorchoice"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1635,6 +1675,45 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c08c74e62047bb2de4ff487b251e4a92e24f48745648451635cec7d591162d9f"
 
 [[package]]
+name = "rpc"
+version = "0.1.0"
+dependencies = [
+ "byteorder",
+ "bytes",
+ "crc32c",
+ "criterion",
+ "crossbeam-channel",
+ "ctrlc",
+ "docopt",
+ "env_logger",
+ "exitfailure",
+ "feature",
+ "fs4",
+ "futures",
+ "ipc-channel",
+ "log",
+ "log4rs",
+ "memmap",
+ "memmap2",
+ "page_size",
+ "prost",
+ "protobuf 2.28.0",
+ "protobuf-codegen 3.3.0",
+ "protobuf-codegen-pure",
+ "protoc-bin-vendored",
+ "protoc-rust",
+ "rand",
+ "serde",
+ "tokio",
+ "tonic",
+ "tonic-build",
+ "tower",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
+]
+
+[[package]]
 name = "rustc-demangle"
 version = "0.1.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1749,6 +1828,46 @@ dependencies = [
  "ryu",
  "serde",
  "yaml-rust",
+]
+
+[[package]]
+name = "server"
+version = "0.1.0"
+dependencies = [
+ "byteorder",
+ "bytes",
+ "crc32c",
+ "criterion",
+ "crossbeam-channel",
+ "ctrlc",
+ "docopt",
+ "env_logger",
+ "exitfailure",
+ "feature",
+ "fs4",
+ "futures",
+ "ipc-channel",
+ "log",
+ "log4rs",
+ "memmap",
+ "memmap2",
+ "page_size",
+ "prost",
+ "protobuf 2.28.0",
+ "protobuf-codegen 3.3.0",
+ "protobuf-codegen-pure",
+ "protoc-bin-vendored",
+ "protoc-rust",
+ "rand",
+ "rpc",
+ "serde",
+ "tokio",
+ "tonic",
+ "tonic-build",
+ "tower",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
 ]
 
 [[package]]

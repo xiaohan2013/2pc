@@ -122,10 +122,16 @@ fn main() -> Result<(), exitfailure::ExitFailure> {
     // println!("Got: {}", res)
     // register/launch clients, participants, coordinator
     let mut _c1: coordinator::Coordinator = coordinator::Coordinator::new("main".to_string());
-    _c1.init_rpc();
+    let _ = _c1.init_rpc();
+    // let _ =_c1.rpc_server
+    //     .take()
+    //     .expect("failed to take joinhandle")
+    //     .into_inner()
+    //     .join();
     let log_dir = "log/";
     _c1.register_participant("aaaa", log_dir);
     client::Client::commit(&mut _c1, "commit");
+
 
     // open a directory called 'log' for segment and index storage
     // let opts: LogOptions = LogOptions::new(format!(
