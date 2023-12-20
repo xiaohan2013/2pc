@@ -39,21 +39,18 @@ use std::cell::{RefCell, RefMut};
 use std::rc::Rc;
 use std::thread::{self, JoinHandle};
 
-use super::coordinator::Coordinator;
-
-use crate::coordinator::CHANNEL;
+use super::coordinator::{CHANNEL, Coordinator};
 
 #[derive(Debug)]
 pub struct Participant {
     name: String,
     success_prob: f64,
     log_file: File,
-    channel: Arc<CHANNEL<String>>,
     worker: Option<JoinHandle<()>>,
 }
 
 impl Participant {
-    pub fn new(name: String, log_file: String, receiver: Arc<CHANNEL<String>>) -> Self {
+    pub fn new(name: String, log_file: String) -> Self {
         let mut rng = rand::thread_rng();
         let log_file_name = format!("{}participant_{}.log", log_file, name);
         let c_logfile_name = &log_file_name;
@@ -71,13 +68,8 @@ impl Participant {
             name: name,
             success_prob: rng.gen(),
             log_file: log_file,
-            channel: receiver,
             worker: None,
         }
-    }
-
-    pub fn init_rpc(){
-        
     }
 
     pub fn append_log(&mut self, msg: String) {
@@ -90,10 +82,6 @@ impl Participant {
     }
 
     pub fn vote(&mut self, msg: String) {
-        let res = self.channel.1.recv().unwrap_or_else(|error| {
-            panic!("{:?}", error)
-        });
-        println!(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> {:?}", res);
         self.append_log(msg);
         self.start();
     }
@@ -118,5 +106,6 @@ impl Display for Participant {
         write!(f, " Participant[name:{}, success_prob: {:.2}], log_file: {:?}", self.name, self.success_prob, self.log_file)
     }
 }
+
 
 

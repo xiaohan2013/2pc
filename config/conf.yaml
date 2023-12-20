@@ -1,0 +1,9 @@
+---
+env: dev
+host:
+  - 1
+  - 2
+role: coordinator
+participants:
+  - 127.0.0.1:50052
+  - 127.0.0.1:50053
