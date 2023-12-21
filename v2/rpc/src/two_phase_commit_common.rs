@@ -12,43 +12,34 @@ pub struct BaseResp {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct PreparePhaseReq {
+pub struct RegisterParticipantReq {
     #[prost(string, tag = "1")]
     pub version: ::prost::alloc::string::String,
     #[prost(string, tag = "2")]
-    pub command: ::prost::alloc::string::String,
+    pub name: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub endpoint: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct PreparePhaseResp {
+pub struct RegisterParticipantResp {
     #[prost(string, tag = "1")]
     pub version: ::prost::alloc::string::String,
     #[prost(string, tag = "2")]
-    pub ack: ::prost::alloc::string::String,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct CommitPhaseReq {
-    #[prost(string, tag = "1")]
-    pub version: ::prost::alloc::string::String,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct CommitPhaseResp {
-    #[prost(string, tag = "1")]
-    pub version: ::prost::alloc::string::String,
+    pub code: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub msg: ::prost::alloc::string::String,
 }
 /// Generated client implementations.
-pub mod two_phase_commit_service_client {
+pub mod common_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
-    /// service which can be executed
     #[derive(Debug, Clone)]
-    pub struct TwoPhaseCommitServiceClient<T> {
+    pub struct CommonServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl TwoPhaseCommitServiceClient<tonic::transport::Channel> {
+    impl CommonServiceClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -59,7 +50,7 @@ pub mod two_phase_commit_service_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> TwoPhaseCommitServiceClient<T>
+    impl<T> CommonServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -77,7 +68,7 @@ pub mod two_phase_commit_service_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> TwoPhaseCommitServiceClient<InterceptedService<T, F>>
+        ) -> CommonServiceClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
@@ -91,7 +82,7 @@ pub mod two_phase_commit_service_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            TwoPhaseCommitServiceClient::new(InterceptedService::new(inner, interceptor))
+            CommonServiceClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with the given encoding.
         ///
@@ -124,13 +115,10 @@ pub mod two_phase_commit_service_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        pub async fn prepare(
+        pub async fn hearbeat(
             &mut self,
-            request: impl tonic::IntoRequest<super::PreparePhaseReq>,
-        ) -> std::result::Result<
-            tonic::Response<super::PreparePhaseResp>,
-            tonic::Status,
-        > {
+            request: impl tonic::IntoRequest<super::BaseReq>,
+        ) -> std::result::Result<tonic::Response<super::BaseResp>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -142,24 +130,20 @@ pub mod two_phase_commit_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/two_phase_commit.TwoPhaseCommitService/Prepare",
+                "/two_phase_commit_common.CommonService/Hearbeat",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("two_phase_commit.TwoPhaseCommitService", "Prepare"),
+                    GrpcMethod::new("two_phase_commit_common.CommonService", "Hearbeat"),
                 );
             self.inner.unary(req, path, codec).await
         }
-        /// function which can be called
-        /// rpc SendStream(SayRequest) returns (stream SayResponse);
-        /// rpc ReceiveStream(stream SayRequest) returns (SayResponse);
-        /// rpc Bidirectional(stream SayRequest) returns (stream SayResponse);
-        pub async fn commit(
+        pub async fn register_participant(
             &mut self,
-            request: impl tonic::IntoRequest<super::CommitPhaseReq>,
+            request: impl tonic::IntoRequest<super::RegisterParticipantReq>,
         ) -> std::result::Result<
-            tonic::Response<super::CommitPhaseResp>,
+            tonic::Response<super::RegisterParticipantResp>,
             tonic::Status,
         > {
             self.inner
@@ -173,43 +157,41 @@ pub mod two_phase_commit_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/two_phase_commit.TwoPhaseCommitService/Commit",
+                "/two_phase_commit_common.CommonService/RegisterParticipant",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new("two_phase_commit.TwoPhaseCommitService", "Commit"),
+                    GrpcMethod::new(
+                        "two_phase_commit_common.CommonService",
+                        "RegisterParticipant",
+                    ),
                 );
             self.inner.unary(req, path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod two_phase_commit_service_server {
+pub mod common_service_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with TwoPhaseCommitServiceServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with CommonServiceServer.
     #[async_trait]
-    pub trait TwoPhaseCommitService: Send + Sync + 'static {
-        async fn prepare(
+    pub trait CommonService: Send + Sync + 'static {
+        async fn hearbeat(
             &self,
-            request: tonic::Request<super::PreparePhaseReq>,
+            request: tonic::Request<super::BaseReq>,
+        ) -> std::result::Result<tonic::Response<super::BaseResp>, tonic::Status>;
+        async fn register_participant(
+            &self,
+            request: tonic::Request<super::RegisterParticipantReq>,
         ) -> std::result::Result<
-            tonic::Response<super::PreparePhaseResp>,
+            tonic::Response<super::RegisterParticipantResp>,
             tonic::Status,
         >;
-        /// function which can be called
-        /// rpc SendStream(SayRequest) returns (stream SayResponse);
-        /// rpc ReceiveStream(stream SayRequest) returns (SayResponse);
-        /// rpc Bidirectional(stream SayRequest) returns (stream SayResponse);
-        async fn commit(
-            &self,
-            request: tonic::Request<super::CommitPhaseReq>,
-        ) -> std::result::Result<tonic::Response<super::CommitPhaseResp>, tonic::Status>;
     }
-    /// service which can be executed
     #[derive(Debug)]
-    pub struct TwoPhaseCommitServiceServer<T: TwoPhaseCommitService> {
+    pub struct CommonServiceServer<T: CommonService> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
@@ -217,7 +199,7 @@ pub mod two_phase_commit_service_server {
         max_encoding_message_size: Option<usize>,
     }
     struct _Inner<T>(Arc<T>);
-    impl<T: TwoPhaseCommitService> TwoPhaseCommitServiceServer<T> {
+    impl<T: CommonService> CommonServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -269,10 +251,9 @@ pub mod two_phase_commit_service_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>>
-    for TwoPhaseCommitServiceServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for CommonServiceServer<T>
     where
-        T: TwoPhaseCommitService,
+        T: CommonService,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -288,25 +269,23 @@ pub mod two_phase_commit_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/two_phase_commit.TwoPhaseCommitService/Prepare" => {
+                "/two_phase_commit_common.CommonService/Hearbeat" => {
                     #[allow(non_camel_case_types)]
-                    struct PrepareSvc<T: TwoPhaseCommitService>(pub Arc<T>);
-                    impl<
-                        T: TwoPhaseCommitService,
-                    > tonic::server::UnaryService<super::PreparePhaseReq>
-                    for PrepareSvc<T> {
-                        type Response = super::PreparePhaseResp;
+                    struct HearbeatSvc<T: CommonService>(pub Arc<T>);
+                    impl<T: CommonService> tonic::server::UnaryService<super::BaseReq>
+                    for HearbeatSvc<T> {
+                        type Response = super::BaseResp;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::PreparePhaseReq>,
+                            request: tonic::Request<super::BaseReq>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as TwoPhaseCommitService>::prepare(&inner, request).await
+                                <T as CommonService>::hearbeat(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -318,7 +297,7 @@ pub mod two_phase_commit_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = PrepareSvc(inner);
+                        let method = HearbeatSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -334,25 +313,26 @@ pub mod two_phase_commit_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/two_phase_commit.TwoPhaseCommitService/Commit" => {
+                "/two_phase_commit_common.CommonService/RegisterParticipant" => {
                     #[allow(non_camel_case_types)]
-                    struct CommitSvc<T: TwoPhaseCommitService>(pub Arc<T>);
+                    struct RegisterParticipantSvc<T: CommonService>(pub Arc<T>);
                     impl<
-                        T: TwoPhaseCommitService,
-                    > tonic::server::UnaryService<super::CommitPhaseReq>
-                    for CommitSvc<T> {
-                        type Response = super::CommitPhaseResp;
+                        T: CommonService,
+                    > tonic::server::UnaryService<super::RegisterParticipantReq>
+                    for RegisterParticipantSvc<T> {
+                        type Response = super::RegisterParticipantResp;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::CommitPhaseReq>,
+                            request: tonic::Request<super::RegisterParticipantReq>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as TwoPhaseCommitService>::commit(&inner, request).await
+                                <T as CommonService>::register_participant(&inner, request)
+                                    .await
                             };
                             Box::pin(fut)
                         }
@@ -364,7 +344,7 @@ pub mod two_phase_commit_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = CommitSvc(inner);
+                        let method = RegisterParticipantSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -395,7 +375,7 @@ pub mod two_phase_commit_service_server {
             }
         }
     }
-    impl<T: TwoPhaseCommitService> Clone for TwoPhaseCommitServiceServer<T> {
+    impl<T: CommonService> Clone for CommonServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -407,7 +387,7 @@ pub mod two_phase_commit_service_server {
             }
         }
     }
-    impl<T: TwoPhaseCommitService> Clone for _Inner<T> {
+    impl<T: CommonService> Clone for _Inner<T> {
         fn clone(&self) -> Self {
             Self(Arc::clone(&self.0))
         }
@@ -417,8 +397,7 @@ pub mod two_phase_commit_service_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: TwoPhaseCommitService> tonic::server::NamedService
-    for TwoPhaseCommitServiceServer<T> {
-        const NAME: &'static str = "two_phase_commit.TwoPhaseCommitService";
+    impl<T: CommonService> tonic::server::NamedService for CommonServiceServer<T> {
+        const NAME: &'static str = "two_phase_commit_common.CommonService";
     }
 }

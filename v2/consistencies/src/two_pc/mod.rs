@@ -9,5 +9,6 @@ extern crate memmap2;
 extern crate futures as futures_core;
 extern crate tower;
 
+mod message;
 pub mod coordinator;
 pub mod participant;

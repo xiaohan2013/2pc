@@ -1,5 +1,5 @@
 use tonic::{transport::Server, Request, Response, Status};
-use super::two_phase_commit::{PreparePhaseReq, PreparePhaseResp, CommitPhaseReq, CommitPhaseResp};
+use super::two_phase_commit::*;
 use super::two_phase_commit::two_phase_commit_service_server::{TwoPhaseCommitService, TwoPhaseCommitServiceServer};
 
 // defining a struct for our service
@@ -21,4 +21,5 @@ impl TwoPhaseCommitService for TwoPhaseCommitPrepare {
     async fn commit(&self, req: Request<CommitPhaseReq>) -> Result<Response<CommitPhaseResp>, Status> {
         Ok(Response::new(CommitPhaseResp { version: "1".to_owned() }))
     }
+
 }

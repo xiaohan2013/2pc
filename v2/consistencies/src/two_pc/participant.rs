@@ -40,6 +40,7 @@ use std::rc::Rc;
 use std::thread::{self, JoinHandle};
 
 use super::coordinator::{CHANNEL, Coordinator};
+use super::message::STATUS;
 
 #[derive(Debug)]
 pub struct Participant {
@@ -47,6 +48,7 @@ pub struct Participant {
     success_prob: f64,
     log_file: File,
     worker: Option<JoinHandle<()>>,
+    state: STATUS,
 }
 
 impl Participant {
@@ -69,6 +71,7 @@ impl Participant {
             success_prob: rng.gen(),
             log_file: log_file,
             worker: None,
+            state: STATUS::UNLOCK,
         }
     }
 

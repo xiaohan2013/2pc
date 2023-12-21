@@ -8,6 +8,8 @@ use crossbeam_channel::{bounded, tick, Receiver, select};
 use tonic::{transport::Server, Request, Response, Status, Result};
 use rpc::server::TwoPhaseCommitPrepare;
 use rpc::two_phase_commit::two_phase_commit_service_server::TwoPhaseCommitServiceServer;
+use rpc::two_phase_commit_client::client_service_server::ClientServiceServer;
+use rpc::two_phase_commit_common::common_service_server::CommonServiceServer;
 use consistencies::two_pc::coordinator::{self, Coordinator};
 use config::{File, FileFormat, Config};
 use std::rc::Rc;
@@ -35,6 +37,9 @@ async fn _grpc_server(c: Arc<RpcCoordinator>) -> std::io::Result<()>{
     let addr: std::net::SocketAddr = "127.0.0.1:50051".parse().unwrap();
     tracing::info!(message = "Starting server.", %addr);
 
+    let _c1 = c.clone();
+    let _c2 = c.clone();
+
     tokio::spawn(async move {
         // creating a service
         // let coordinator = Coordinator::default();
@@ -44,6 +49,8 @@ async fn _grpc_server(c: Arc<RpcCoordinator>) -> std::io::Result<()>{
         Server::builder()
             .trace_fn(|_| tracing::info_span!("helloworld_server"))
             .add_service(TwoPhaseCommitServiceServer::from_arc(c))
+            .add_service(ClientServiceServer::from_arc(_c1))
+            .add_service(CommonServiceServer::from_arc(_c2))
             .serve(addr)
             .await
             .expect("msg");

@@ -38,6 +38,11 @@ fn main() {
         .build_server(true)
         .build_client(true)
         .out_dir("v2/rpc/src")
-        .compile(&["protos/two_phase_commit.proto"], &["protos"])
-        .unwrap()
+        .compile(&[
+            "protos/two_phase_commit.proto", 
+            "protos/client.proto", 
+            "protos/common.proto"], &["protos"])
+        .unwrap_or_else(|err| {
+            panic!("{:?}", err)
+        })
 }

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package two_phase_commit_client;
+
+service ClientService {
+    rpc Submit(ClientSubmitReq) returns (ClientSubmitResp);
+}
+
+message ClientSubmitReq {
+    string version = 1;
+    map<string, string> data = 9;
+}
+
+message ClientSubmitResp {
+    string version = 1;
+}

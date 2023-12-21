@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package two_phase_commit_common;
+
+service CommonService {
+    rpc Hearbeat(BaseReq) returns (BaseResp);
+    rpc RegisterParticipant(RegisterParticipantReq) returns (RegisterParticipantResp);
+}
+
+message BaseReq {
+    string version = 1;
+}
+
+message BaseResp {
+    string version = 1;
+}
+
+message RegisterParticipantReq {
+    string version = 1;
+    string name = 2;
+    string endpoint = 3;
+}
+message RegisterParticipantResp {
+    string version = 1;
+    string code = 2;
+    string msg =3;
+}

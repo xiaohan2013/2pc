@@ -1,10 +1,9 @@
-const VOTE_COMMIT = "vote";
-const VOTE_ABORT = "abort";
+const VOTE_COMMIT: &'static str = "vote";
+const VOTE_ABORT: &'static str = "abort";
 
+#[derive(Debug)]
 pub enum STATUS {
-
-}
-
-pub struct ProtocolMessage {
-    
+    LOCKED,
+    UNLOCK,
+    COMMITED,
 }

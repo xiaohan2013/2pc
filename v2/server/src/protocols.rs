@@ -7,7 +7,11 @@ use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::RwLock;
 use std::sync::Mutex;
-
+use rpc::two_phase_commit_client::client_service_server::ClientService;
+use rpc::two_phase_commit_client::{ClientSubmitReq, ClientSubmitResp};
+use rpc::two_phase_commit_common::common_service_server::CommonService;
+use rpc::two_phase_commit_common::{RegisterParticipantReq, RegisterParticipantResp, BaseReq, BaseResp};
+use rpc::RpcClient;
 
 #[derive(Default, Debug)]
 pub struct RpcCoordinator {
@@ -18,6 +22,9 @@ pub struct RpcCoordinator {
 pub struct RpcParticipant {
     pub p: Mutex<RefCell<Participant>>,
 }
+
+impl RpcClient for RpcCoordinator{}
+impl RpcClient for RpcParticipant{}
 
 #[tonic::async_trait]
 impl TwoPhaseCommitService for RpcParticipant {
@@ -54,5 +61,54 @@ impl TwoPhaseCommitService for RpcCoordinator {
     }
     async fn commit(&self, req: Request<CommitPhaseReq>) -> Result<Response<CommitPhaseResp>, Status> {
         Ok(Response::new(CommitPhaseResp { version: "1".to_owned() }))
+    }
+}
+
+#[tonic::async_trait]
+impl ClientService for RpcCoordinator {
+    async fn submit(&self, req: Request<ClientSubmitReq>) -> Result<Response<ClientSubmitResp>, Status> {
+        let _data = &req.get_ref().data;
+        println!("{:?}", _data);
+        {
+            let c = self.c.try_lock().unwrap();
+            // drop MutexGuard 
+            c.borrow_mut().start_txn("aaaaaaaaaaaaaaaaaaa");
+            // std::mem::drop(c);
+        }
+        Ok(Response::new(ClientSubmitResp {
+             version: "1".to_owned() 
+        }))
+    }
+}
+
+
+#[tonic::async_trait]
+impl CommonService for RpcCoordinator {
+    async fn register_participant(&self, req: Request<RegisterParticipantReq>) -> Result<Response<RegisterParticipantResp>, Status> {
+        let _version = &req.get_ref().version;
+        let _endpoint = &req.get_ref().endpoint;
+        let _name = &req.get_ref().name;
+        println!("version: {}, name: {}, endpoint: {} ", _version, _name, _endpoint);
+        {
+            let c = self.c.try_lock().unwrap();
+            // drop MutexGuard 
+            let mut _c = c.borrow_mut();
+
+            _c.register_participant(_name, _endpoint);
+
+            // std::mem::drop(c);
+        }
+
+        Ok(Response::new(RegisterParticipantResp {
+             version: "1".to_owned(),
+             code: "0".to_string(),
+             msg: "Success".to_string(),
+        }))
+    }
+
+    async fn hearbeat(&self, req: Request<BaseReq>) -> Result<Response<BaseResp>, Status> {
+        Ok(Response::new(BaseResp {
+             version: "1".to_owned(),
+        }))
     }
 }

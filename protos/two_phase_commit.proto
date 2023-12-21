@@ -6,14 +6,12 @@ package two_phase_commit;
 
 // service which can be executed
 service TwoPhaseCommitService {
-    // 
     rpc Prepare(PreparePhaseReq) returns (PreparePhaseResp);
     // function which can be called
     // rpc SendStream(SayRequest) returns (stream SayResponse);
     // rpc ReceiveStream(stream SayRequest) returns (SayResponse);
     // rpc Bidirectional(stream SayRequest) returns (stream SayResponse);
     rpc Commit(CommitPhaseReq) returns (CommitPhaseResp);
-    // rpc Hearbeat(BaseReq) returns (BaseResp);
 }
 
 message BaseReq {
