@@ -1,2 +1,2 @@
-# 2pc
-Two phase commit protocol implementation with Rust
+# Store Engine
+Store engine based multiple protocols implementation with Rust
