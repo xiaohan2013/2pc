@@ -14,7 +14,9 @@ use rpc::two_phase_commit_common::{RegisterParticipantReq, RegisterParticipantRe
 use std::io;
 use local_ip_address::local_ip;
 use local_ip_address::list_afinet_netifas;
-
+use std::borrow::Borrow;
+use std::concat;
+use std::string::String;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -36,8 +38,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let _name = args.name;
 
     // creating a channel ie connection to server
+    let _local_ip = local_ip_address::local_ip()?;
+    tracing::info!("local ip : {:?}", _local_ip);
+    // let addr = concat!("http://", Box::leak(_local_ip.into_boxed_str()), ":50051");
+    let __local_ip = String::from(_local_ip.to_string());
+    let _addr = format!("http://{}:50051", __local_ip);
+    let __addr = Box::leak(_addr.into_boxed_str());
     // let channel = tonic::transport::Channel::from_static("http://[::1]:50051")
-    let channel = tonic::transport::Channel::from_static("http://127.0.0.1:50051")
+    let channel = tonic::transport::Channel::from_static(__addr)
     .connect()
     .await?;
 

@@ -5,7 +5,11 @@ pub mod two_phase_commit_client;
 pub mod two_phase_commit;
 pub mod server;
 pub mod client;
-use std::any::Any;
+
+use tonic::{transport::Server, Request, Response, Status, Result};
 
 use std::fmt::Debug;
-pub trait RpcClient where Self : Debug + Send + Sync {}
+#[tonic::async_trait]
+pub trait RpcClient where Self : Debug + Send + Sync {
+    async fn send_prepare_participant(&self, endpoint: &'static str) -> Result<(), Box<dyn std::error::Error>>;
+}

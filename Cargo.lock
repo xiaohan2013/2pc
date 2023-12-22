@@ -2135,6 +2135,7 @@ version = "0.1.0"
 dependencies = [
  "byteorder",
  "bytes",
+ "clap",
  "config",
  "consistencies",
  "crc32c",
@@ -2148,6 +2149,7 @@ dependencies = [
  "fs4",
  "futures",
  "ipc-channel",
+ "local-ip-address",
  "log",
  "log4rs",
  "memmap",
@@ -2586,6 +2588,7 @@ version = "0.1.0"
 dependencies = [
  "byteorder",
  "bytes",
+ "clap",
  "crc32c",
  "criterion",
  "crossbeam-channel",

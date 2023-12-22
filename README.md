@@ -12,3 +12,9 @@ Two phase commit protocol implementation with Rust.
 - engine : 
 - rpc
 - 
+
+```sh
+cargo run --package server -- --role coordinator
+cargo run --package server -- --role participant
+
+```

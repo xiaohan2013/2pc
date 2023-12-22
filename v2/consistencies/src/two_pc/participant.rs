@@ -38,6 +38,8 @@ use std::sync::mpsc::{channel, Sender, Receiver};
 use std::cell::{RefCell, RefMut};
 use std::rc::Rc;
 use std::thread::{self, JoinHandle};
+use std::sync::Mutex;
+use std::cell::Cell;
 
 use super::coordinator::{CHANNEL, Coordinator};
 use super::message::STATUS;
@@ -48,10 +50,13 @@ pub struct Participant {
     success_prob: f64,
     log_file: File,
     worker: Option<JoinHandle<()>>,
-    state: STATUS,
+    state: Mutex<Cell<STATUS>>,
 }
 
 impl Participant {
+    pub fn default() -> Self {
+        Participant::new("name".to_string(), "log_file".to_string())
+    }
     pub fn new(name: String, log_file: String) -> Self {
         let mut rng = rand::thread_rng();
         let log_file_name = format!("{}participant_{}.log", log_file, name);
@@ -71,7 +76,7 @@ impl Participant {
             success_prob: rng.gen(),
             log_file: log_file,
             worker: None,
-            state: STATUS::UNLOCK,
+            state: Mutex::new(Cell::new(STATUS::UNLOCK)),
         }
     }
 
@@ -86,7 +91,9 @@ impl Participant {
 
     pub fn vote(&mut self, msg: String) {
         self.append_log(msg);
-        self.start();
+        // self.start();
+        let _state = self.state.try_lock().unwrap();
+        _state.replace(STATUS::LOCKED);
     }
 
     pub fn run(self: &mut Self) {

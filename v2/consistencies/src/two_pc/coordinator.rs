@@ -34,8 +34,8 @@ pub type CHANNEL<T> = Arc<(Sender<T>, Receiver<T>)>;
 
 #[derive(Debug, Default)]
 pub struct Coordinator {
-    name: String,
-    participants: HashMap<String, Option<String>>,
+    pub name: String,
+    pub participants: HashMap<String, Option<String>>,
 }
 
 impl Coordinator {
@@ -48,14 +48,15 @@ impl Coordinator {
     }
 
     fn query_to_commit(&mut self, msg: String){
-        for (name, p) in self.participants.iter_mut() {
-            println!("{:?} => {:?}", name, p.take());
+        let participants = self.participants.borrow_mut();
+        for (name, p) in participants {
+            tracing::debug!("query_to_commit: {:?} => {:?}", name, p);
             // p.vote(msg.to_string());
         }
     }
 
     pub fn pre_commit(&mut self, msg: &str){
-        println!("{:?}", msg);
+        tracing::debug!("pre_commit : {:?}", msg);
         self.query_to_commit(msg.to_string());
     }
 
@@ -77,6 +78,7 @@ impl Coordinator {
         } else {
             println!("Participant {:} has been existed!!!", name)
         }
+        tracing::debug!("register participant {:?}", self.participants)
     }
 }
 
