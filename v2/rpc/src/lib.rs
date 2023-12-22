@@ -12,4 +12,5 @@ use std::fmt::Debug;
 #[tonic::async_trait]
 pub trait RpcClient where Self : Debug + Send + Sync {
     async fn send_prepare_participant(&self, endpoint: &'static str) -> Result<(), Box<dyn std::error::Error>>;
+    fn heart_pacemaker();
 }

@@ -95,7 +95,7 @@ async fn _grpc_server_participant(p: Arc<RpcParticipant>) -> std::io::Result<()>
             .add_service(ClientServiceServer::from_arc(_p))
             .serve(addr)
             .await
-            .expect("msg");
+            .expect("failed to start Participant Grpc Server!!!");
     });
 
     Ok(())
@@ -136,10 +136,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     if _role == "participant" {
-        let p = RpcParticipant{
+        let rpc_participant = RpcParticipant{
             p: Mutex::new(RefCell::new(Participant::default()))
         };
-        servers.push(_grpc_server_participant(Arc::new(p)).boxed());
+        servers.push(_grpc_server_participant(Arc::new(rpc_participant)).boxed());
     }
 
     if servers.is_empty() {

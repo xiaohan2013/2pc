@@ -15,6 +15,9 @@ use rpc::RpcClient;
 use rpc::two_phase_commit_client::client_service_client::ClientServiceClient;
 use std::collections::HashMap;
 use futures::executor;
+use timer;
+use std::time::Duration;
+use chrono;
 
 
 #[derive(Default, Debug)]
@@ -54,8 +57,22 @@ impl RpcClient for RpcCoordinator{
         println!("RESPONSE={:?}", response);
         Ok(())
     }
+    fn heart_pacemaker() { todo!(); }
 }
-// impl RpcClient for RpcParticipant{}
+
+#[tonic::async_trait]
+impl RpcClient for RpcParticipant{
+    async fn send_prepare_participant(&self, endpoint: &'static str) -> Result<(), Box<dyn std::error::Error>> {
+        todo!();
+    }
+    fn heart_pacemaker() { 
+        tracing::debug!("heart_pacemaker");
+        let timer = timer::Timer::new();
+        timer.schedule_repeating(chrono::Duration::milliseconds(5000), move || {
+            tracing::debug!("heart beat!!!")
+        });
+    }
+}
 
 #[tonic::async_trait]
 impl TwoPhaseCommitService for RpcParticipant {
@@ -113,7 +130,7 @@ impl TwoPhaseCommitService for RpcCoordinator {
         }))
     }
     async fn commit(&self, req: Request<CommitPhaseReq>) -> Result<Response<CommitPhaseResp>, Status> {
-        Ok(Response::new(CommitPhaseResp { version: "1".to_owned() }))
+        todo!();
     }
 }
 
@@ -177,8 +194,6 @@ impl CommonService for RpcCoordinator {
     }
 
     async fn hearbeat(&self, req: Request<BaseReq>) -> Result<Response<BaseResp>, Status> {
-        Ok(Response::new(BaseResp {
-             version: "1".to_owned(),
-        }))
+        todo!();
     }
 }
